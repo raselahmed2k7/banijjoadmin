@@ -274,6 +274,11 @@ class Products extends Component {
     	productSPDFull: [...prevState.productSPDFull, { spd: ""}]
     }))
     this.state.productSPD.push(targetedValue);
+
+    // const { name, value } = e.target;
+    // let productSPDFull = [...this.state.productSPDFull];
+    // productSPDFull = {...productSPDFull, [name]: value};
+    // this.setState({ productSPDFull });
   }
 
   addImageClick(){
@@ -303,6 +308,17 @@ class Products extends Component {
         </FormGroup>
       </div>          
     ))
+
+    // return (
+    //   <div>
+    //     <FormGroup row>
+    //      <Col xs="12" md="12">
+    //       <Input placeholder="Destails Specification" name={"SPD: "+e} id="SPD" />
+    //       <br/>
+    //      </Col>
+    //     </FormGroup>
+    //   </div>  
+    // )
   }
   
   createUI(){
@@ -425,7 +441,6 @@ class Products extends Component {
   changeSpecification = (event) => {
     console.log('change specification : ', event.target.value);
     let targetedValue = event.target.value;
-    var count = 0 ;
     this.setState(prevState => ({ 
     	productSPName: [...prevState.productSPName]
     }))
@@ -435,19 +450,11 @@ class Products extends Component {
 
     {
       this.state.productsSpecificationName.map((productsSpecificationNameValue, key) =>
-      
-        event.target.value == productsSpecificationNameValue.category_id ? 
-        <div row>
-          {this.displaySpecificationValueData.push(<Col md="3">{productsSpecificationNameValue.specification_name} :</Col>)}
-          {
-            JSON.parse(productsSpecificationNameValue.value).map((productsSpecificationNameValueParsed, key) =>
-              this.displaySpecificationValueData.push(<Col md="9"><input type="checkbox" name="specificationBox" value={event.target.value+" : "+productsSpecificationNameValueParsed} onClick={this.specificationBoxFun.bind(this)}/> {productsSpecificationNameValueParsed}</Col>)
-            )
-          }
-        </div>
-        : 
+        event.target.value == productsSpecificationNameValue.id ? 
+          JSON.parse(productsSpecificationNameValue.value).map((productsSpecificationNameValueParsed, key) =>
+            this.displaySpecificationValueData.push(<div><input type="checkbox" name="specificationBox" value={event.target.value+" : "+productsSpecificationNameValueParsed} onClick={this.specificationBoxFun.bind(this)}/> {productsSpecificationNameValueParsed}</div>)
+          ) : 
         null
-        
       )
     }
     this.displaySpecificationValueData.push(<hr/>);
@@ -649,10 +656,10 @@ class Products extends Component {
                     </FormGroup>
                     <FormGroup row>
                       <Col md="3">
-                        <Label htmlFor="productCategory">Product Category </Label>
+                        <Label htmlFor="productCategory">Product Category LOL</Label>
                       </Col>
                       <Col xs="12" md="9">
-                        <Input type="select" name="productCategory" id="productCategory" onChange={this.changeSpecification} value={this.state.value}>
+                        <Input type="select" name="productCategory" id="productCategory">
                           <option value="0">Please select</option>
                           {
                             this.state.productsCategory.map((productsCategoryValue, key) =>
@@ -701,7 +708,7 @@ class Products extends Component {
                         </Input>
                       </Col>
                     </FormGroup>
-                    {/* <FormGroup row>
+                    <FormGroup row>
                       <Col md="3">
                         <Label htmlFor="productSpecification">Product Specification</Label>
                       </Col>
@@ -715,13 +722,13 @@ class Products extends Component {
                           }
                         </Input>
                       </Col>
-                    </FormGroup> */}
+                    </FormGroup>
 
                     {/* Color according to the specificatoion */}
                     <FormGroup row>
                       <Col md="3">
                       </Col>
-                      <Col md="9">
+                      <Col xs="12" md="9">
 
                         {this.displaySpecificationValueData}
 
