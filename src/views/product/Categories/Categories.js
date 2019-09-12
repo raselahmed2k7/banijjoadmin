@@ -102,7 +102,17 @@ class Categories extends Component {
       body: JSON.stringify(this.state)
     })
     .then((result) => result.json())
-    .then((info) => { console.log(info); })
+    .then((info) => { 
+      console.log(info); 
+      setTimeout(
+        function() {
+        // this.props.history.push("/product/vendor");
+        window.location = '/product/categories';
+        }
+        .bind(this),
+        3000
+      );
+    })
   }
 
   handleChange(event) {

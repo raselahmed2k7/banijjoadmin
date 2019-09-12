@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import {ToastsContainer, ToastsStore} from 'react-toasts';
+
+import "./tag.scss";
 
 import {
   Badge,
@@ -33,9 +36,17 @@ class ProductSpecifications extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
+
+    this.AddValuesRef = React.createRef();
+    this.ProductSpecificationValArray = [];
+
     this.state = {
       productsCategory: [],
       productsSpecificationDetails: [],
+      specificationDetails : [],
+      ProductSpecificationValues: [],
+      ProductSpecificationValuesArray: [],
+      tags: '',
       collapse: true,
       fadeIn: true,
       timeout: 300
@@ -94,9 +105,20 @@ class ProductSpecifications extends Component {
     });
   }
 
+  handleAddTags (event) {
+    console.log(event.target.value);
+
+    this.setState({
+      tags: event.target.value
+    });
+
+    console.log("Tag : ", this.state.Tags);
+
+    
+  }
+
   handleProductChange(event) {
-    // this.setState({value: event.target.value});
-    // alert(event.target.value);
+    
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = target.name;
@@ -104,6 +126,33 @@ class ProductSpecifications extends Component {
     this.setState({
       [name]: value
     });
+  }
+
+  handleAddValues (event) {
+
+    this.setState({
+      // ProductSpecificationValuesArray: this.state.ProductSpecificationValues
+    });
+
+    this.state.ProductSpecificationValuesArray.push(this.state.ProductSpecificationValues);
+
+    // this.ProductSpecificationValArray.push(this.state.ProductSpecificationValues);
+
+    ReactDOM.findDOMNode(this.refs.clear).value = "";
+  }
+
+  handleAddChange (event) {
+    this.setState({ ProductSpecificationValues: event.target.value });
+  }
+
+  handleDeleteButton (keyId) {
+    console.log("Key for delete:",keyId);
+
+    let ProductSpecificationValuesArray = this.state.ProductSpecificationValuesArray.filter((e, i) => i !== keyId);
+    this.setState({ ProductSpecificationValuesArray : ProductSpecificationValuesArray });
+
+    console.log(this.state.ProductSpecificationValuesArray);
+    
   }
 
   handleSubmit(event) {
@@ -120,8 +169,16 @@ class ProductSpecifications extends Component {
     .then((result) => result.json())
     .then((info) => { 
       if (info.success == true) {
-        ToastsStore.success("Product Successfully inserted !!");
+        ToastsStore.success("Product Specification Successfully inserted !!");
         console.log(info.success);
+        setTimeout(
+          function() {
+          // this.props.history.push("/product/products");
+          window.location = '/product/products-specifications';
+          }
+          .bind(this),
+          3000
+        );
       }
       else {
         ToastsStore.warning("Product Insertion Faild. Please try again !!");
@@ -148,7 +205,7 @@ class ProductSpecifications extends Component {
                   <Label htmlFor="name">Specification Name</Label>
                 </Col>
                 <Col xs="12" md="9">
-                  <Input type="text" id="name" name="name" placeholder="Name" />
+                  <Input type="text" id="name" name="name" placeholder="Name" required="true" />
                 </Col>
               </FormGroup>
 
@@ -156,8 +213,30 @@ class ProductSpecifications extends Component {
                 <Col md="3">
                   <Label htmlFor="values">Specification Vales</Label>
                 </Col>
+                <Col xs="12" md="7">
+                  <Input type="text" id="values" name="values" placeholder="values" ref='clear' onChange={this.handleAddChange.bind(this)} />
+                </Col>
+                <Col xs="12" md="2">
+                  <Button block color="ghost-primary" onClick={this.handleAddValues.bind(this)}> Add </Button>
+                </Col>
+                
+              </FormGroup>
+
+              <FormGroup row>
+                <Col md="3">
+                  &nbsp;
+                </Col>
+
                 <Col xs="12" md="9">
-                  <Input type="text" id="values" name="values" placeholder="values" />
+                  <div row>
+                    {
+                      this.state.ProductSpecificationValuesArray.map((ProductSpecificationVal, key) =>
+                        
+                        <Button style={{paddingLeft:"10px",marginLeft:"10px"}} className="btn-pill btn btn-dark" type="button" size="sm" color="primary" id="tagButton" value={key} onClick={this.handleDeleteButton.bind(this,key)}> {ProductSpecificationVal} <i style={{color:'red'}} className="fa fa-close"></i> </Button> 
+
+                      )
+                    }
+                  </div>
                 </Col>
               </FormGroup>
 
@@ -188,7 +267,7 @@ class ProductSpecifications extends Component {
                   </Input>
                 </Col>
               </FormGroup>
-              <Button type="submit" size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Submit</Button>&nbsp;
+              <Button type="submit" size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Submit</Button>&nbsp;
               <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
             </Form>
           </CardBody>
@@ -230,6 +309,7 @@ class ProductSpecifications extends Component {
                             JSON.parse(productsSpecificationDetailsValue.value).map((productsSpecificationDetailsValueParsed, key) =>
                               <div>
                                 - {productsSpecificationDetailsValueParsed}
+                                
                               </div>
                             )
                           }
