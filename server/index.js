@@ -133,6 +133,16 @@ app.get('/api/user_list', (req, res) => {
   });
 });
 
+app.get('/api/updateShop', (req, res) => {
+  dbConnection.query("UPDATE user SET user_status='approved'", function (error, results) {
+    console.log(results);
+    if (error) throw error;
+
+    
+    return res.send({ error: error, data: results, message: 'success' });
+  });
+});
+
 app.post('/api/saveProduct',(req,res)=>{
   console.log('The Request : ', req.body);
 
@@ -249,13 +259,14 @@ app.post('/api/user-login', (req, res) => {
 
   var sessionStorage = '';
 
-  select_sql_query = "SELECT id FROM user WHERE username='"+req.body.username+"' AND password='"+req.body.password+"'";
+  select_sql_query = "SELECT username,email,user_status FROM user WHERE username='"+req.body.username+"' AND password='"+req.body.password+"'";
 
-  dbConnection.query(select_sql_query, function (error, results, fields) {
-    console.log(results);
+  dbConnection.query(select_sql_query, function (error, results) {
+    console.log("results",results);
     if (results.length > 0) {
-      req.session.username = req.body.username;
-      req.session.password = req.body.password;
+      req.session.username = results[0].username;
+      req.session.email = results[0].email;
+      req.session.user_status = results[0].user_status;
       sessionStorage = req.session;
 
       console.log(req.session);

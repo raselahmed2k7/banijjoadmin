@@ -52,27 +52,41 @@ class Login extends Component {
       },
       body: JSON.stringify(this.state)
     })
+
     .then((result) => result.json())
     .then((info) => { 
       if (info.success == true) {
         ToastsStore.success("User  Successfully Logedin !!");
         console.log('Success : ', info.success);
-        console.log('Session : ', info.session);
-        console.log('Session name : ', info.session.username);
-        console.log('Session password : ', info.session.password);
 
         localStorage.setItem('userName', info.session.username);
-        localStorage.setItem('userPassword', info.session.password);
-        
-        console.log(localStorage);
+        localStorage.setItem('email', info.session.email);
+        localStorage.setItem('user_status', info.session.user_status);
+        const isApproved = localStorage.user_status=='approved'?true:false;
+        isApproved===true ? this.props.history.push("/dashboard"):this.props.history.push("/rogister");
+        console.log("consoling localstorage",isApproved);
+        // if(isApproved){
+        //   this.props.history.push("/dashboard");
 
-        setTimeout(
-          function() {
-            this.props.history.push("/dashboard");
-          }
-          .bind(this),
-          3000
-        );
+        // }
+        // else{
+        //   this.props.history.push("/Vendorcomplete");
+
+        // }
+        // setTimeout(
+        //   function() {
+        //      if(localStorage.user_status=='approved'){
+        //       this.props.history.push("/dashboard");
+
+        //     }
+        //     else{
+        //       this.props.history.push("/Vendorcomplete");
+
+        //     }
+        //   }
+        //   .bind(this),
+        //   3000
+        // );
       }
       else {
         ToastsStore.warning("User Logedin Failed. Please try again !!");
