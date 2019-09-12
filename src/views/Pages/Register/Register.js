@@ -58,6 +58,7 @@ class Register extends Component {
         'Content-type': 'application/json'
       },
       body: JSON.stringify(this.state)
+      // body: this.state
     })
     .then((result) => result.json())
     .then((info) => { 

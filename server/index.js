@@ -22,7 +22,7 @@ var isNullOrEmpty = require('is-null-or-empty');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(session({secret: 'ambalabanijjopluscom'}));
+app.use(session({key: 'username', secret: 'ambalabanijjopluscom'}));
 
 const dbConnection = mysql.createConnection ({
   host: 'localhost',
@@ -46,14 +46,14 @@ app.use(bodyParser.json());
 
 
 app.get('/api/categories', (req, res) => {
-  dbConnection.query('SELECT * FROM category', function (error, results, fields) {
+  dbConnection.query('SELECT * FROM category ORDER BY id DESC', function (error, results, fields) {
     if (error) throw error;
     return res.send({ error: error, data: results, message: 'category list.' });
   });
 });
 
 app.get('/api/product_specification_names', (req, res) => {
-  dbConnection.query('SELECT * FROM product_specification_names', function (error, results, fields) {
+  dbConnection.query('SELECT * FROM product_specification_names ORDER BY id DESC', function (error, results, fields) {
     console.log(results);
     if (error) throw error;
     return res.send({ error: error, data: results, message: 'sepecification name list.' });
@@ -61,7 +61,7 @@ app.get('/api/product_specification_names', (req, res) => {
 });
 
 app.get('/api/product_specification_details', (req, res) => {
-  dbConnection.query('SELECT * FROM product_specification_details', function (error, results, fields) {
+  dbConnection.query('SELECT * FROM product_specification_details WHERE status="active" ORDER BY id DESC', function (error, results, fields) {
     console.log(results);
     if (error) throw error;
     return res.send({ error: error, data: results, message: 'sepecification name list.' });
@@ -69,7 +69,7 @@ app.get('/api/product_specification_details', (req, res) => {
 });
 
 app.get('/api/vendor_list_for_product', (req, res) => {
-  dbConnection.query('SELECT * FROM vendor', function (error, results, fields) {
+  dbConnection.query('SELECT * FROM vendor ORDER BY id DESC', function (error, results, fields) {
     console.log(results);
     if (error) throw error;
     return res.send({ error: error, data: results, message: 'sepecification name list.' });
@@ -77,7 +77,56 @@ app.get('/api/vendor_list_for_product', (req, res) => {
 });
 
 app.get('/api/product_list', (req, res) => {
-  dbConnection.query('SELECT * FROM products', function (error, results, fields) {
+  console.log('Session Values : ', req.query.id);
+
+  dbConnection.query('SELECT employee_id, user_type FROM user WHERE username="'+ req.query.id +'"', function (error, results, fields) {
+    console.log('User Type : ', results[0].user_type);
+    if (error) throw error;
+    if (results[0].user_type == 'vendor') {
+      vendor_products (results[0].employee_id, res);
+    }
+    else {
+      admin_products (res);
+    }
+    // return res.send({ error: error, data: results, message: 'sepecification name list.' });
+  });
+
+  // dbConnection.query('SELECT * FROM products ORDER BY id DESC', function (error, results, fields) {
+  //   console.log('THE result is : ', results);
+  //   if (error) throw error;
+  //   return res.send({ error: error, data: results, message: 'sepecification name list.' });
+  // });
+});
+
+function vendor_products (vendor_id, res) {
+  console.log('Inside the vendor_products function & vendor is : ', vendor_id);
+  dbConnection.query('SELECT * FROM products WHERE vendor_id = "'+ vendor_id +'" ORDER BY id DESC', function (error, results, fields) {
+    console.log(results);
+    if (error) throw error;
+    return res.send({ error: error, data: results, message: 'sepecification name list.' });
+  });
+}
+
+function admin_products (res) {
+  dbConnection.query('SELECT * FROM products ORDER BY id DESC', function (error, results, fields) {
+    console.log(results);
+    if (error) throw error;
+    // return results;
+    return res.send({ error: error, data: results, message: 'sepecification name list.' });
+  });
+}
+
+// app.get('/api/product_list_vendor_wise', (req, res) => {
+//   console.log('Vendor Id : ', req.body);
+//   dbConnection.query('SELECT * FROM products ORDER BY id DESC', function (error, results, fields) {
+//     console.log(results);
+//     if (error) throw error;
+//     return res.send({ error: error, data: results, message: 'sepecification name list.' });
+//   });
+// });
+
+app.get('/api/user_list', (req, res) => {
+  dbConnection.query('SELECT * FROM user', function (error, results, fields) {
     console.log(results);
     if (error) throw error;
     return res.send({ error: error, data: results, message: 'sepecification name list.' });
@@ -87,34 +136,34 @@ app.get('/api/product_list', (req, res) => {
 app.post('/api/saveProduct',(req,res)=>{
   console.log('The Request : ', req.body);
 
-  // return res.send({success: true});
+  return res.send({success: true});
 
-  try {
-    if ((isNullOrEmpty(req.body.productName) == false) && (isNullOrEmpty(req.body.productPrice) == false) && (isNullOrEmpty(req.body.productSKU) == false) && (req.body.productCategory != 0) && (isNullOrEmpty(req.body.productBrand) == false) && (req.body.vendorId != 0)) {
+  // try {
+  //   if ((isNullOrEmpty(req.body.productName) == false) && (isNullOrEmpty(req.body.productPrice) == false) && (isNullOrEmpty(req.body.productSKU) == false) && (req.body.productCategory != 0) && (isNullOrEmpty(req.body.productBrand) == false) && (req.body.vendorId != 0)) {
 
-      var insert_sql_query = "INSERT INTO products (product_name, category_id, product_sku, product_specification_id, product_specification_name, product_specification_details, product_specification_details_description, product_full_description, qc_status, image, vendor_id, status) VALUES ('"+req.body.productName+"', '"+req.body.productCategory+"', '"+req.body.productSKU+"', '"+JSON.stringify(req.body.productSPName)+"', '"+JSON.stringify(req.body.productSpecificationBoxFun)+"', '"+JSON.stringify(req.body.productSPD)+"', '"+JSON.stringify(req.body.productSPDFull)+"', '"+JSON.stringify(req.body.productDescriptionFull)+"', '1', '"+JSON.stringify(req.body.images)+"', '"+req.body.vendorId+"', '1' )";
+  //     var insert_sql_query = "INSERT INTO products (product_name, category_id, product_sku, product_specification_id, product_specification_name, product_specification_details, product_specification_details_description, product_full_description, qc_status, image, vendor_id, status) VALUES ('"+req.body.productName+"', '"+req.body.productCategory+"', '"+req.body.productSKU+"', '"+JSON.stringify(req.body.productSPName)+"', '"+JSON.stringify(req.body.productSpecificationBoxFun)+"', '"+JSON.stringify(req.body.productSPD)+"', '"+JSON.stringify(req.body.productSPDFull)+"', '"+JSON.stringify(req.body.productDescriptionFull)+"', '1', '"+JSON.stringify(req.body.images)+"', '"+req.body.vendorId+"', '1' )";
 
-      dbConnection.query(insert_sql_query, function (err, result) {
+  //     dbConnection.query(insert_sql_query, function (err, result) {
           
-          if (result) {
-              console.log("1 record inserted to category");
-              return res.send({success: true, server_message: result});
-          }
-          else {
-              console.log('Error to inseret at category : ', err);
-              return res.send({success: false, error: err});
-          }
+  //         if (result) {
+  //             console.log("1 record inserted to category");
+  //             return res.send({success: true, server_message: result});
+  //         }
+  //         else {
+  //             console.log('Error to inseret at category : ', err);
+  //             return res.send({success: false, error: err});
+  //         }
 
-      });
-    }
-    else{
-      return res.send({success: false});
-    }
+  //     });
+  //   }
+  //   else{
+  //     return res.send({success: false});
+  //   }
     
-  }
-  catch (error) {
-      if (error) return res.send({success: false, error: 'Error has occured at the time of insert data to PRODUCTS table', request : req.body});
-  }
+  // }
+  // catch (error) {
+  //     if (error) return res.send({success: false, error: 'Error has occured at the time of insert data to PRODUCTS table', request : req.body});
+  // }
 
 });
 
@@ -187,6 +236,7 @@ app.post('/api/vendor-registration',(req,res)=>{
 
     }
     else {
+      Console.log('Not OK !!');
       return res.send({success: false});
     }
     
@@ -255,7 +305,7 @@ app.post('/api/saveVendor', type, (req,res)=>{
   // src.on('end', function() { return res.send({success: true, request:req.body}); });
   // src.on('error', function(err) { return res.send({success: false, request:req.body}); });
 
-  return res.send({success: true, request:req.body});
+  // return res.send({success: true, request:req.body});
 
   try {
     var insert_sql_query = "INSERT INTO vendor (name, email, website, address, status) VALUES ('"+req.body.name+"', '"+req.body.email+"', '"+req.body.website+"', '"+req.body.address+"', '1' )";
@@ -284,12 +334,15 @@ app.post('/api/saveSpecification',(req,res)=>{
   values = req.body.values;
   var valuesArray = values.split(" ");
 
-  console.log('The Request : ', req.body);
+  console.log('The Request values : ', req.body.ProductSpecificationValuesArray);
+  console.log('The Request values json formate : ', JSON.stringify(req.body.ProductSpecificationValuesArray));
+  console.log('The Request name : ', req.body.name);
+  console.log('The Request categoryId : ', req.body.categoryId);
 
   // return res.send({success: true});
 
   try {
-    var insert_sql_query = "INSERT INTO product_specification_names (specification_name, category_id, value, status) VALUES ('"+req.body.name+"', '"+req.body.categoryId+"', '"+JSON.stringify(valuesArray)+"', '1' )";
+    var insert_sql_query = "INSERT INTO product_specification_names (specification_name, category_id, value, status) VALUES ('"+req.body.name+"', '"+req.body.categoryId+"', '"+JSON.stringify(req.body.ProductSpecificationValuesArray)+"', '1' )";
 
     dbConnection.query(insert_sql_query, function (err, result) {
         
@@ -313,14 +366,14 @@ app.post('/api/saveSpecification',(req,res)=>{
 
 app.post('/api/saveSpecificationDetails',(req,res)=>{
   values = req.body.specification_details_name;
-  var valuesArray = values.split(" ");
+  // var valuesArray = values.split(" ");
   
-  console.log('The Request : ', req.body);
+  console.log('The Request : ', req.body.ProductSpecificationValuesArray);
 
   // return res.send({success: true});
 
   try {
-    var insert_sql_query = "INSERT INTO product_specification_details (category_id, specification_details_name, status) VALUES ('"+req.body.categoryId+"', '"+JSON.stringify(valuesArray)+"', '1' )";
+    var insert_sql_query = "INSERT INTO product_specification_details (category_id, specification_details_name, status) VALUES ('"+req.body.categoryId+"', '"+JSON.stringify(req.body.ProductSpecificationValuesArray)+"', '1' )";
 
     dbConnection.query(insert_sql_query, function (err, result) {
         

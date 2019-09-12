@@ -39,6 +39,7 @@
     "react-router": "^5.0.1",
     "react-router-config": "^5.0.1",
     "react-router-dom": "^5.0.1",
+    "react-tag-input": "^6.4.1",
     "react-test-renderer": "^16.8.6",
     "react-toasts": "^3.0.3",
     "reactstrap": "^8.0.0",

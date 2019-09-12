@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import {ToastsContainer, ToastsStore} from 'react-toasts';
 
 import {
@@ -36,6 +37,7 @@ class ProductSpecificationDetails extends Component {
     this.state = {
       productsCategory: [],
       productsSpecificationDetails: [],
+      ProductSpecificationValuesArray: [],
       collapse: true,
       fadeIn: true,
       timeout: 300
@@ -95,6 +97,33 @@ class ProductSpecificationDetails extends Component {
 
   }
 
+  handleAddValues (event) {
+
+    this.setState({
+      // ProductSpecificationValuesArray: this.state.ProductSpecificationValues
+    });
+
+    this.state.ProductSpecificationValuesArray.push(this.state.ProductSpecificationValues);
+
+    // this.ProductSpecificationValArray.push(this.state.ProductSpecificationValues);
+
+    ReactDOM.findDOMNode(this.refs.clear).value = "";
+  }
+
+  handleDeleteButton (keyId) {
+    console.log("Key for delete:",keyId);
+
+    let ProductSpecificationValuesArray = this.state.ProductSpecificationValuesArray.filter((e, i) => i !== keyId);
+    this.setState({ ProductSpecificationValuesArray : ProductSpecificationValuesArray });
+
+    console.log(this.state.ProductSpecificationValuesArray);
+    
+  }
+
+  handleAddChange (event) {
+    this.setState({ ProductSpecificationValues: event.target.value });
+  }
+
   handleProductChange(event) {
     // this.setState({value: event.target.value});
     // alert(event.target.value);
@@ -121,8 +150,16 @@ class ProductSpecificationDetails extends Component {
     .then((result) => result.json())
     .then((info) => { 
       if (info.success == true) {
-        ToastsStore.success("Product Successfully inserted !!");
+        ToastsStore.success("Product Specification Details Successfully inserted !!");
         console.log(info.success);
+        setTimeout(
+          function() {
+          // this.props.history.push("/product/products");
+          window.location = '/product/products-specification-details';
+          }
+          .bind(this),
+          3000
+        );
       }
       else {
         ToastsStore.warning("Product Insertion Faild. Please try again !!");
@@ -145,12 +182,43 @@ class ProductSpecificationDetails extends Component {
           <CardBody>
             <Form action="" method="post" onSubmit={this.handleSubmit} onChange={this.handleProductChange} encType="multipart/form-data" className="form-horizontal">
 
-              <FormGroup row>
+              {/* <FormGroup row>
                 <Col md="3">
                   <Label htmlFor="specification_details_name">Specification Details Name</Label>
                 </Col>
                 <Col xs="12" md="9">
                   <Input type="textarea" id="specification_details_name" name="specification_details_name" placeholder="Details Name" />
+                </Col>
+              </FormGroup> */}
+
+              <FormGroup row>
+                <Col md="3">
+                  <Label htmlFor="values">Specification Details Name</Label>
+                </Col>
+                <Col xs="12" md="7">
+                  <Input type="text" id="values" name="values" placeholder="values" ref='clear' onChange={this.handleAddChange.bind(this)} />
+                </Col>
+                <Col xs="12" md="2">
+                  <Button block color="ghost-primary" onClick={this.handleAddValues.bind(this)}> Add </Button>
+                </Col>
+              
+              </FormGroup>
+
+              <FormGroup row>
+                <Col md="3">
+                  &nbsp;
+                </Col>
+
+                <Col xs="12" md="9">
+                  <div row>
+                    {
+                      this.state.ProductSpecificationValuesArray.map((ProductSpecificationVal, key) =>
+
+                        <Button style={{paddingLeft:"10px",marginLeft:"10px"}} className="btn-pill btn btn-dark" type="button" size="sm" color="primary" id="tagButton" value={key} onClick={this.handleDeleteButton.bind(this,key)}> {ProductSpecificationVal} <i style={{color:'red'}} className="fa fa-close"></i> </Button> 
+
+                      )
+                    }
+                  </div>
                 </Col>
               </FormGroup>
 
@@ -181,7 +249,7 @@ class ProductSpecificationDetails extends Component {
                   </Input>
                 </Col>
               </FormGroup>
-              <Button type="submit" size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Submit</Button>&nbsp;
+              <Button type="submit" size="sm" color="success"><i className="fa fa-dot-circle-o"></i> Submit</Button>&nbsp;
               <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
             </Form>
           </CardBody>

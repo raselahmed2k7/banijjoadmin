@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {ToastsContainer, ToastsStore} from 'react-toasts';
 import ImageUploader from 'react-images-upload';
-import axios from 'axios';
-
 // import { Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
 import {
   Badge,
@@ -39,7 +37,6 @@ class Vendor extends Component {
     this.state = {
       vendorList: [],
       pictures: [],
-      submittedValue: [],
       collapse: true,
       fadeIn: true,
       timeout: 300
@@ -59,13 +56,6 @@ class Vendor extends Component {
   }
 
   componentDidMount() {
-    const userName = localStorage.getItem('userName');
-    const userPassword = localStorage.getItem('userPassword');
-    if(userName===null && userPassword === null)
-    {
-      this.props.history.push("/login");
-    }
-
     fetch('/api/vendor_list_for_product', {
       method: 'GET'
     })
@@ -84,123 +74,65 @@ class Vendor extends Component {
     });
   }
 
-  // handleProductChange(event) {
-  //   console.log('Picture : ', event);
-
-  //   if (!(event instanceof Event)) {
-  //     console.log('synthetic');
-
-  //     this.setState({
-  //       ['image']: this.state.pictures.concat(event),
-  //     }); 
-  //   }
-  //   else {
-  //     let target = event.target;
-  //     let value = target.type === 'checkbox' ? target.checked : target.value;
-  //     let name = target.name;
-
-  //     this.setState({
-  //       [name]: value
-  //     });
-
-  //     console.log('non synthetic');
-  //   }
-
-  // }
-
   handleProductChange(event) {
     // this.setState({value: event.target.value});
     // alert(event.target.input.files[0]);
-    console.log('Picture : ', event);
-
     let target = event.target;
-    // let value = target.type === 'checkbox' ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = target.name;
 
-    // this.setState({
-    //   [name]: value
-    // });
-
-    if (name == 'image') {
-      let value = target.files[0];
-
-      this.setState({
-        [name]: value
-      });
-    }
-    else {
-      let value = target.type === 'checkbox' ? target.checked : target.value;
-
-      this.setState({
-        [name]: value
-      });
-    }
-
-    console.log(target.name);
-    // console.log(target.files[0]);
-
-    
+    this.setState({
+      [name]: value
+    });
   }
 
   onDrop(picture) {
-    console.log('Calling handler !', picture);
-    this.handleProductChange(picture);
-    console.log('Calling handler !', picture);
-
-    // this.setState({
-    //     pictures: this.state.pictures.concat(picture),
-    // }); 
-
-    // console.log('Pictures : ', this.state.pictures);
+    
+    this.setState({
+        pictures: this.state.pictures.concat(picture),
+    });
 
   }
 
   handleSubmit (event) {
     event.preventDefault();
-    
-    console.log('submitted value : ', JSON.stringify(this.state));
+    console.log('submitted value : ', this.state);
     console.log('submitted Image : ', this.state.image);
-    console.log('submitted Image value : ', this.state);
+    console.log('submitted Image value : ', this.state.pictures[0].path);
 
     // this.setState({
     //   pictures: this.state.pictures.concat(this.state.image),
     // });
 
-    // console.log('submitted Picture value : ', this.state.pictures);
+    console.log('submitted Picture value : ', this.state.pictures);
 
-    // fetch('/api/saveVendor' , {
-    //   method: "POST",
-    //   headers: {
-    //     'Content-type': 'application/json'
-    //   },
-    //   body: JSON.stringify(this.state)
-    // })
-    // .then((result) => result.json())
-    // .then((info) => { 
-    //   if (info.success == true) {
-    //     ToastsStore.success("Vendor Successfully inserted !!");
-    //     console.log(info.success);
-    //   }
-    //   else {
-    //     ToastsStore.warning("Vendor Insertion Faild. Please try again !!");
-    //     console.log(info.success);
-    //   }
+    fetch('/api/saveVendor' , {
+      method: "POST",
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(this.state)
+    })
+    .then((result) => result.json())
+    .then((info) => { 
+      if (info.success == true) {
+        ToastsStore.success("Vendor Successfully inserted !!");
+        console.log(info.success);
+        setTimeout(
+          function() {
+          // this.props.history.push("/product/vendor");
+          window.location = '/product/vendor';
+          }
+          .bind(this),
+          3000
+        );
+      }
+      else {
+        ToastsStore.warning("Product Insertion Faild. Please try again !!");
+        console.log(info.success);
+      }
       
-    // })
-
-    let formData = new FormData();
-
-    formData.append('image', this.state.image);
-    formData.append('name', this.state.name);
-
-    // console.log('form data : ', formData);
-
-    // for (var key of formData.entries()) {
-    //   console.log(key[0] + ', ' + key[1]);
-    // }
-    
-    axios.post('/api/saveVendor', formData)
-    .then(res => {console.log(res)});
+    })
   }
 
   render() {
@@ -275,17 +207,17 @@ class Vendor extends Component {
                   <Label htmlFor="image">Vendor Image</Label>
                 </Col>
                 <Col xs="12" md="9">
-                      <Input type="file" id="image" name="image" />
-                      {/* <ImageUploader
+                      {/* <Input type="file" id="image" name="image" /> */}
+                      <ImageUploader
                         id="iamge"
                         name="image"
                         withIcon={true}
                         buttonText='Choose images'
-                        onChange={this.onDrop.bind(this)}
+                        onChange={this.onDrop}
                         imgExtension={['.jpg', '.gif', '.png', '.gif']}
                         maxFileSize={5242880}
                         withPreview = {true}
-                      /> */}
+                      />
                     </Col>
               </FormGroup>
               <Button type="submit" size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Submit</Button>&nbsp;
