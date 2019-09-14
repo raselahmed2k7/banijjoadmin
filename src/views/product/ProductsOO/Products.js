@@ -85,8 +85,7 @@ class Products extends Component {
       showDisplaySpecificationDetailsData : this.displaySpecificationDetailsData,
       postProductsSpecificationDetails : "",
       // specficationsAll : [],
-      specificationDetailsFullState : {},
-      vendorId: '',
+      // specificationDetailsFull : [{specificationDetails: ""}],
 
       details : "",
 
@@ -190,7 +189,7 @@ class Products extends Component {
 
       this.state.vendorList.map ((value, key) => {
         if (value.email == this.state.userName) {
-          this.state.userCode = '000'+value.id;
+          this.state.userCode = value.code;
         }
       })
 
@@ -234,18 +233,18 @@ class Products extends Component {
 
       let countProducts = this.state.productList.length+1;
 
-      while (countProducts.toString().length < 5) {
-        countProducts = "0" + countProducts;
-        console.log('product counter increment : ', countProducts.length);
-      }
+      // while (countProducts < 5) {
+      //   countProducts = "0" + countProducts;
+      //   console.log('product counter increment : ', countProducts.length);
+      // }
 
-      console.log('product counter increment Final : ', countProducts);
+      console.log('product counter increment Final : ', countProducts.length);
 
       this.setState ({
         newProductCode : countProducts
       })
 
-      console.log('Vendor Data : ', this.state.productList);
+      console.log('Vendor Data : ', this.state.productList.length);
 
       return false;
     });
@@ -259,45 +258,7 @@ class Products extends Component {
 
     console.log(this.state);
 
-    // this.state.specificationDetailsFullState = this.specificationDetailsFull;
-    // console.log(this.state.specificationDetailsFullState);
-    // console.log(this.specificationDetailsFull);
-    
-    // this.specificationDetailsFull.map ((value, key) => {
-    //   console.log('value for specification details : ', value[key]);
-    //   console.log('value for details : ', value[key].value);
-    //   this.state.specificationDetailsFullState[key] = key +":"+ value[key].value;
-    // })
-
     // const { categoryName, parentCategory, categoryDescription, isActive } = this.state;
-
-    // setTimeout(
-    //   function() {
-        
-    //     fetch('/api/saveProduct' , {
-    //       method: "POST",
-    //       headers: {
-    //         'Content-type': 'application/json'
-    //       },
-    //       body: JSON.stringify(this.state)
-    //     })
-    //     .then((result) => result.json())
-    //     .then((info) => { 
-    //       if (info.success == true) {
-    //         ToastsStore.success("Product Successfully inserted !!");
-    //         console.log(info.success);
-    //       }
-    //       else {
-    //         ToastsStore.warning("Product Insertion Faild. Please try again !!");
-    //         console.log(info.success);
-    //       }
-          
-    //     })
-
-    //   }
-    //   .bind(this),
-    //   2000
-    // );
 
     fetch('/api/saveProduct' , {
       method: "POST",
@@ -310,25 +271,16 @@ class Products extends Component {
     .then((info) => { 
       if (info.success == true) {
         ToastsStore.success("Product Successfully inserted !!");
-        setTimeout(
-          function() {
-            window.location = '/product/products';
-          }
-          .bind(this),
-          3000
-        );
+        // window.location = "/product/products";
+        window.location = '/product/products';
         console.log(info.success);
-        console.log(info.message);
       }
       else {
         ToastsStore.warning("Product Insertion Faild. Please try again !!");
         console.log(info.success);
-        console.log(info.message);
       }
       
     })
-
-    
   }
 
   handleDelete (event) {
@@ -482,19 +434,14 @@ class Products extends Component {
     this.setState({ productDescriptionFull });
   }
 
-  handleChangeSpecification(key, e) {
-
-    console.log(e.target);
-    console.log(key);
-    let i =0;
+  handleChangeSpecification(e) {
+    
     const { name, value } = e.target;
-    console.log(name);
-    console.log(value);
+    // alert(name);
+    // alert(value);
     let specificationDetailsFull = [...this.specificationDetailsFull];
-    specificationDetailsFull = {...specificationDetailsFull, value};
-    this.specificationDetailsFull[key] = specificationDetailsFull;
-    this.state.specificationDetailsFullState[key] = specificationDetailsFull;
-    console.log(this.specificationDetailsFull);
+    specificationDetailsFull = {...specificationDetailsFull, [name]: value};
+    this.specificationDetailsFull = specificationDetailsFull;
     // this.setState({ specificationDetailsFull });
   }
 
@@ -593,26 +540,19 @@ class Products extends Component {
     // }
     // this.displaySpecificationValueData.push(<hr/>);
 
-    let counter = 0;
-    let counters = 0;
-
     {
+      this.specficationsAll.push(<Col md="5">{'Product Specifications '} :</Col>)
       this.state.productsSpecificationName.map((productsSpecificationNameValue, key) =>
       
         event.target.value == productsSpecificationNameValue.category_id ? 
-          <div row>
-            {this.specficationsAll.push(<Col md="3">{ counter == 0 ? 'Product Specifications ' : null }</Col>)}
-            {this.specficationsAll.push(<Col md="9">{productsSpecificationNameValue.specification_name} :</Col>)}
-            {++counter}
-            {
-              JSON.parse(productsSpecificationNameValue.value).map((productsSpecificationNameValueParsed, key) =>
-                <div>
-                  {this.specficationsAll.push(<Col md="3"></Col>)}
-                  {this.specficationsAll.push(<Col md="9"><input type="checkbox" name="specificationBox" value={event.target.value+" : "+productsSpecificationNameValueParsed} onClick={this.specificationBoxFun.bind(this)}/> {productsSpecificationNameValueParsed}</Col>)}
-                </div>
+        <div row>
+          {this.specficationsAll.push(<Col md="5">{productsSpecificationNameValue.specification_name} :</Col>)}
+          {
+            JSON.parse(productsSpecificationNameValue.value).map((productsSpecificationNameValueParsed, key) =>
+              {this.specficationsAll.push(<Col md="7"><input type="checkbox" name="specificationBox" value={event.target.value+" : "+productsSpecificationNameValueParsed} onClick={this.specificationBoxFun.bind(this)}/> {productsSpecificationNameValueParsed}</Col>)}
               )
-            }
-          </div>
+          }
+        </div>
         : 
         null
       )
@@ -621,22 +561,12 @@ class Products extends Component {
         
     {
       this.state.productsSpecificationDetails.map((productsSpecificationDetailsValue, key) =>
-        JSON.parse(productsSpecificationDetailsValue.specification_details_name).map((productsSpecificationDetailsValueParsed, key) =>
-          <div row>
-            {
-              event.target.value == productsSpecificationDetailsValue.category_id ? 
-              // this.specficationsAll.push(<div> { counters == 0 ? <Col md="3"><Label htmlFor="productSpecificationDetails">Product Specification Details&nbsp; </Label></Col> : <Col md="3"></Col> } <Col md="9"> {productsSpecificationDetailsValueParsed}&nbsp; <Input type="text" id="detailsId" /*onChange={this.handleChangeSpecification.bind(this)}*/ name={"detailsId : "+productsSpecificationDetailsValueParsed+" "} /*value={productsSpecificationDetailsValueParsed+" : "}*/  /> </Col> </div>) : 
-              <div>
-                {this.specficationsAll.push(<Col md="3">{ counters == 0 ? <Label htmlFor="productSpecificationDetails">Product Specification Details&nbsp; </Label> : null }</Col>)}
-                {this.specficationsAll.push(<Col md="9">{productsSpecificationDetailsValueParsed}&nbsp; <Input type="text" id="detailsId" onChange={this.handleChangeSpecification.bind(this, productsSpecificationDetailsValueParsed)} name={"detailsId"} /*value={productsSpecificationDetailsValueParsed+" : "}*/  /></Col>)}
-                {++counters}
-              </div>
-              :null
-            }
-            
-          </div>
-          
-        )
+        
+          JSON.parse(productsSpecificationDetailsValue.specification_details_name).map((productsSpecificationDetailsValueParsed, key) =>
+            event.target.value == productsSpecificationDetailsValue.category_id ? 
+            this.specficationsAll.push(<div><Label htmlFor="productSpecificationDetails">Product Specification Details ({productsSpecificationDetailsValueParsed}) : </Label><Input type="text" id="detailsId" /*onChange={this.handleChangeSpecification.bind(this)}*/ name={"detailsId : "+productsSpecificationDetailsValueParsed+" "} /*value={productsSpecificationDetailsValueParsed+" : "}*/  /><br /></div>) : 
+            null
+          )
       )
     }
 
@@ -844,12 +774,12 @@ class Products extends Component {
                         <Label htmlFor="productCategory">Product Category </Label>
                       </Col>
                       <Col xs="12" md="9">
-                        <Input type="select" name="productCategory" onChange={this.changeSpecification} id="productCategory"  value={this.state.value}>
+                        <Input type="select" name="productCategory" id="productCategory" onChange={this.changeSpecification} value={this.state.value}>
                           <option value="0">Please select</option>
                           {
                             this.state.productsCategory.map((productsCategoryValue, key) =>
                               <option value={productsCategoryValue.id}> {productsCategoryValue.category_name} </option>
-                            ) 
+                            )
                           }
                         </Input>
                       </Col>
@@ -876,9 +806,7 @@ class Products extends Component {
                       this.state.userList.map((userListValue, key) =>
                       userListValue.username == this.state.userName ? 
                         userListValue.user_type == 'vendor' ?
-                        
                           <div>
-                            {this.state.vendorId = userListValue.employee_id}
                           <FormGroup row>
                             <Col md="3">
                               <Label htmlFor="vendorList">Vendor </Label>
@@ -968,8 +896,16 @@ class Products extends Component {
                     </FormGroup> */}
 
                     {/* Color according to the specificatoion */}
-                    <FormGroup row style={{border: '2px', solid: '#000'}}>
-                      {this.specficationsAll}
+                    <FormGroup row>
+                      <Col md="3">
+                      </Col>
+                      <Col md="9">
+
+                        {/* {this.displaySpecificationValueData} */}
+                        {/* {this.state.specficationsAll} */}
+                        {this.specficationsAll}
+
+                      </Col>
                     </FormGroup>
 
                     {/* <FormGroup row>

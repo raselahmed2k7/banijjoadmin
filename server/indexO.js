@@ -125,16 +125,6 @@ function admin_products (res) {
 //   });
 // });
 
-app.get('/api/updateShop', (req, res) => {
-  dbConnection.query("UPDATE user SET user_status='approved'", function (error, results) {
-    console.log(results);1
-    if (error) throw error;
-
-    
-    return res.send({ error: error, data: results, message: 'success' });
-  });
-});
-
 app.get('/api/user_list', (req, res) => {
   dbConnection.query('SELECT * FROM user', function (error, results, fields) {
     console.log(results);
@@ -146,64 +136,34 @@ app.get('/api/user_list', (req, res) => {
 app.post('/api/saveProduct',(req,res)=>{
   console.log('The Request : ', req.body);
 
-  console.log('Specification Name : ', req.body.productSpecificationBoxFun[0]);
-  console.log('specification details : ', req.body.specificationDetailsFullState);
+  return res.send({success: true});
 
-  var specificationName = [];
-  var specificationDetails = [];
+  // try {
+  //   if ((isNullOrEmpty(req.body.productName) == false) && (isNullOrEmpty(req.body.productPrice) == false) && (isNullOrEmpty(req.body.productSKU) == false) && (req.body.productCategory != 0) && (isNullOrEmpty(req.body.productBrand) == false) && (req.body.vendorId != 0)) {
 
-  for (var i = 0; i < req.body.productSpecificationBoxFun.length; i++) {
-    var splited = req.body.productSpecificationBoxFun[i].split(':');
-    specificationName[i] = splited;
-  }
+  //     var insert_sql_query = "INSERT INTO products (product_name, category_id, product_sku, product_specification_id, product_specification_name, product_specification_details, product_specification_details_description, product_full_description, qc_status, image, vendor_id, status) VALUES ('"+req.body.productName+"', '"+req.body.productCategory+"', '"+req.body.productSKU+"', '"+JSON.stringify(req.body.productSPName)+"', '"+JSON.stringify(req.body.productSpecificationBoxFun)+"', '"+JSON.stringify(req.body.productSPD)+"', '"+JSON.stringify(req.body.productSPDFull)+"', '"+JSON.stringify(req.body.productDescriptionFull)+"', '1', '"+JSON.stringify(req.body.images)+"', '"+req.body.vendorId+"', '1' )";
 
-  // console.log(JSON.stringify(specificationName));
-
-  // for (var i = 0; i < req.body.specificationDetailsFullState.length; i++) {
-  //   // var splited = req.body.specificationDetailsFullState[i].split(':');
-  //   // specificationDetails[i] = splited;
-  //   console.log(req.body.specificationDetailsFullState[i]); 
-  // }
-  // console.log('')
-  // console.log(JSON.stringify( req.body.specificationDetailsFullState));
-
-  // return res.send({success: true});
-
-  var productSKUcode = 'BNJ-'+req.body.userCode+'-'+req.body.newProductCode;
-
-  console.log(req.body.productName);
-  console.log(req.body.productPrice);
-  console.log(productSKUcode);
-  console.log(req.body.productCategory);
-  console.log(req.body.productBrand);
-  console.log(req.body.vendorId);
-
-  try {
-    // if ((isNullOrEmpty(req.body.productName) == false) && (isNullOrEmpty(req.body.productPrice) == false) && (isNullOrEmpty(req.body.productSKU) == false) && (req.body.productCategory != 0) && (isNullOrEmpty(req.body.productBrand) == false) && (req.body.vendorId != 0)) {
-
-      var insert_sql_query = "INSERT INTO products (product_name, category_id, product_sku, product_specification_name, product_specification_details_description, product_full_description, qc_status, image, vendor_id, status) VALUES ('"+req.body.productName+"', '"+req.body.productCategory+"', '"+productSKUcode+"', '"+JSON.stringify(req.body.productSpecificationBoxFun)+"', '"+JSON.stringify(req.body.specificationDetailsFullState)+"', '"+JSON.stringify(req.body.productDescriptionFull)+"', '1', '"+JSON.stringify(req.body.images)+"', '"+req.body.vendorId+"', '1' )";
-
-      dbConnection.query(insert_sql_query, function (err, result) {
+  //     dbConnection.query(insert_sql_query, function (err, result) {
           
-          if (result) {
-              console.log("1 record inserted to category");
-              return res.send({success: true, server_message: result, message: 'DB Success'});
-          }
-          else {
-              console.log('Error to inseret at category : ', err);
-              return res.send({success: false, error: err, message: 'DB Error'});
-          }
+  //         if (result) {
+  //             console.log("1 record inserted to category");
+  //             return res.send({success: true, server_message: result});
+  //         }
+  //         else {
+  //             console.log('Error to inseret at category : ', err);
+  //             return res.send({success: false, error: err});
+  //         }
 
-      });
-    // }
-    // else{
-    //   return res.send({success: false, message: 'required field'});
-    // }
+  //     });
+  //   }
+  //   else{
+  //     return res.send({success: false});
+  //   }
     
-  }
-  catch (error) {
-      if (error) return res.send({success: false, error: 'Error has occured at the time of insert data to PRODUCTS table', request : req.body, message: 'Exception'});
-  }
+  // }
+  // catch (error) {
+  //     if (error) return res.send({success: false, error: 'Error has occured at the time of insert data to PRODUCTS table', request : req.body});
+  // }
 
 });
 
