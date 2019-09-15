@@ -87,6 +87,8 @@ class Products extends Component {
       // specficationsAll : [],
       specificationDetailsFullState : {},
       vendorId: '',
+      productSKUcode : '',
+      user_type: '',
 
       details : "",
 
@@ -119,6 +121,8 @@ class Products extends Component {
 
     this.state.userName = localStorage.getItem('userName');
     const userPassword = localStorage.getItem('userPassword');
+    this.state.vendorId = localStorage.getItem('employee_id');
+    this.state.user_type = localStorage.getItem('user_type');
 
     if(this.state.userName===null && userPassword === null)
     {
@@ -190,7 +194,7 @@ class Products extends Component {
 
       this.state.vendorList.map ((value, key) => {
         if (value.email == this.state.userName) {
-          this.state.userCode = '000'+value.id;
+          this.state.userCode = value.code;
         }
       })
 
@@ -249,6 +253,8 @@ class Products extends Component {
 
       return false;
     });
+
+    
 
   }
 
@@ -310,15 +316,9 @@ class Products extends Component {
     .then((info) => { 
       if (info.success == true) {
         ToastsStore.success("Product Successfully inserted !!");
-        setTimeout(
-          function() {
-            window.location = '/product/products';
-          }
-          .bind(this),
-          3000
-        );
         console.log(info.success);
         console.log(info.message);
+        // window.location = '/product/products';
       }
       else {
         ToastsStore.warning("Product Insertion Faild. Please try again !!");
@@ -334,7 +334,7 @@ class Products extends Component {
   handleDelete (event) {
     // let data = event.currentTarget.dataset['data-id'];
 
-    console.log('Delete handled');
+    console.log('Delete handled' );
   }
 
   handleProductChange(event) {
@@ -547,6 +547,9 @@ class Products extends Component {
     // this.state.specficationsAll=[];
     this.specficationsAll=[];
 
+    this.state.productSKUcode = 'BNJ-'+this.state.userCode+'-'+this.state.newProductCode;
+    
+
     // this.displaySpecificationDetailsData.length=0;
 
     console.log('Array : ', this.displaySpecificationValueData);
@@ -674,7 +677,7 @@ class Products extends Component {
   }
 
   toggleSmall(event) {
-    // console.log('data-id : ', document.getElementById("deleteIds").value);
+    console.log('data-id : ', event.target.value);
     this.setState({
       small: !this.state.small,
     });
@@ -743,7 +746,7 @@ class Products extends Component {
                         <a href="#">
                           <i className="fa fa-edit" title="Edit Product Info"></i>
                         </a>&nbsp;
-                        <a href="#" onClick={this.toggleSmall} id="deleteIds" ref="dataIds" data-id={productListValue.id} value={productListValue.id}>
+                        <a href="#" onClick={this.toggleSmall.bind(this)} id="deleteIds" ref="dataIds" data-id={productListValue.id} value={productListValue.id}>
                           <i className="fa fa-window-close-o" title="Delete This Product"></i>
                         </a>
                       </center>
@@ -873,42 +876,36 @@ class Products extends Component {
                     </FormGroup>
                     
                     {
-                      this.state.userList.map((userListValue, key) =>
-                      userListValue.username == this.state.userName ? 
-                        userListValue.user_type == 'vendor' ?
-                        
-                          <div>
-                            {this.state.vendorId = userListValue.employee_id}
-                          <FormGroup row>
-                            <Col md="3">
-                              <Label htmlFor="vendorList">Vendor </Label>
-                            </Col>
-                            <Col xs="12" md="9">
-                              <Input  type="text" id="vendorId" name="vendorId" placeholder="" readOnly="true" value={this.state.userName} />
-                            </Col>
-                          </FormGroup>
-                          </div>
-                        :
-                        <div>
-                          <FormGroup row>
-                            <Col md="3">
-                              <Label htmlFor="vendorList">Vendor List</Label>
-                            </Col>
-                            <Col xs="12" md="9">
-                              <Input type="select" name="vendorId" id="vendorId">
-                                <option value="0">Please select</option>
-                                {
-                                  this.state.vendorList.map((vendorListValue, key) =>
-                                    <option value={vendorListValue.id}> {vendorListValue.name} </option>
-                                  )
-                                }
-                              </Input>
-                            </Col>
-                          </FormGroup>
-                        </div>
+                      this.state.user_type == 'vendor' ?
+                          
+                      <div>
+                        <FormGroup row>
+                          <Col md="3">
+                            <Label htmlFor="vendorList">Vendor </Label>
+                          </Col>
+                          <Col xs="12" md="9">
+                            <Input  type="text" id="vendorId" name="vendorId" placeholder="" readOnly="true" value={this.state.userName} />
+                          </Col>
+                        </FormGroup>
+                      </div>
                       :
-                      null
-                      )
+                      <div>
+                        <FormGroup row>
+                          <Col md="3">
+                            <Label htmlFor="vendorList">Vendor List</Label>
+                          </Col>
+                          <Col xs="12" md="9">
+                            <Input type="select" name="vendorId" id="vendorId">
+                              <option value="0">Please select</option>
+                              {
+                                this.state.vendorList.map((vendorListValue, key) =>
+                                  <option value={vendorListValue.id}> {vendorListValue.name} </option>
+                                )
+                              }
+                            </Input>
+                          </Col>
+                        </FormGroup>
+                      </div>
                     }
 
                     {
@@ -920,6 +917,7 @@ class Products extends Component {
                               <Col md="3">
                                 <Label htmlFor="productSKU">Product SKU</Label>
                               </Col>
+                              
                               <Col xs="12" md="9">
                                 <Input type="text" id="productSKU" name="productSKU" placeholder="Product SKU" readOnly="true" value={'BNJ-'+this.state.userCode+'-'+this.state.newProductCode} />
                               </Col>

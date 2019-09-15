@@ -62,31 +62,12 @@ class Login extends Component {
         localStorage.setItem('userName', info.session.username);
         localStorage.setItem('email', info.session.email);
         localStorage.setItem('user_status', info.session.user_status);
+        localStorage.setItem('employee_id', info.session.employee_id);
+        localStorage.setItem('user_type', info.session.user_type);
+
         const isApproved = localStorage.user_status=='approved'?true:false;
         isApproved===true ? this.props.history.push("/dashboard"):this.props.history.push("/rogister");
         console.log("consoling localstorage",isApproved);
-        // if(isApproved){
-        //   this.props.history.push("/dashboard");
-
-        // }
-        // else{
-        //   this.props.history.push("/Vendorcomplete");
-
-        // }
-        // setTimeout(
-        //   function() {
-        //      if(localStorage.user_status=='approved'){
-        //       this.props.history.push("/dashboard");
-
-        //     }
-        //     else{
-        //       this.props.history.push("/Vendorcomplete");
-
-        //     }
-        //   }
-        //   .bind(this),
-        //   3000
-        // );
       }
       else {
         ToastsStore.warning("User Logedin Failed. Please try again !!");
