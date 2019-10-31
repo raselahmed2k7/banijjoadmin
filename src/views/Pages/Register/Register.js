@@ -3,6 +3,7 @@ import {ToastsContainer, ToastsStore} from 'react-toasts';
 import  { Redirect } from 'react-router-dom';
 
 import { Button, Card, CardBody, CardFooter, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
 
 const Login = React.lazy(() => import('../Login'));
 
@@ -13,12 +14,14 @@ class Register extends Component {
     this.state = {
       collapse: true,
       fadeIn: true,
-      timeout: 300
+      timeout: 300,
+      inputValue: '',
+      userFound:''
     };
 
     this.handleProductChange = this.handleProductChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-
+console.log(this.state);
   }
 
   componentDidMount () {
@@ -41,10 +44,39 @@ class Register extends Component {
     let name = target.name;
 
     this.setState({
-      [name]: value
+      [name]: value,
+     
     });
     
   }
+  
+
+
+  handleUsernameChange(event){
+    this.setState({
+      inputValue: event.target.value
+    },()=>{
+      fetch(base+'/api/checkUsername', {
+        method: "POST",
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(this.state)
+      })
+      .then((result) => result.json())
+    .then((info) => { 
+      if(info.message){
+        this.setState({userFound:'yes'});
+      }
+      else{
+        this.setState({userFound:'no'});
+      }
+    })
+    });
+  }
+
+
+
 
   handleSubmit (event) {
     event.preventDefault();
@@ -52,7 +84,7 @@ class Register extends Component {
     console.log('submitted JSON value : ', JSON.stringify(this.state));
     console.log('submitted value : ', this.state);
 
-    fetch('/api/vendor-registration' , {
+    fetch(base+'/api/vendor-registration' , {
       method: "POST",
       headers: {
         'Content-type': 'application/json'
@@ -83,6 +115,7 @@ class Register extends Component {
   }
 
   render() {
+    // let status = this.state.userFound;
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -110,7 +143,18 @@ class Register extends Component {
                           <i className="icon-user"></i>
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input type="text" name="userName" required="true" placeholder="User Name" autoComplete="username" />
+
+                    
+                      <Input type="text" className={this.state.userFound=="yes"? "is-valid form-control":this.state.userFound=="no"? "is-invalid form-control":''} value={this.state.inputValue} name="userName" onChange={this.handleUsernameChange.bind(this)} required="true" placeholder="User Name" autoComplete="username" />
+                        <React.Fragment>
+                              {
+                                  this.state.userFound=="yes" ?
+                                  <div style={{marginLeft:"10%",fontSize:"15px"}} className="valid-feedback">Username Available</div>
+                                  : this.state.userFound=="no" ? 
+                                  <div style={{marginLeft:"10%",fontSize:"15px"}} className="invalid-feedback">Username Unvailable</div>
+                                  :''
+                                }              
+                        </React.Fragment>
                     </InputGroup>
 
                     <InputGroup className="mb-3">
@@ -137,7 +181,7 @@ class Register extends Component {
                       </InputGroupAddon>
                       <Input type="password" name="userRePassword" required="true" placeholder="Repeat password" autoComplete="new-password" />
                     </InputGroup>
-
+{/* 
                     <InputGroup className="mb-4">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
@@ -154,21 +198,12 @@ class Register extends Component {
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="text" name="userWebsite" required="true" placeholder="Website" autoComplete="userWebsite" />
-                    </InputGroup>
+                    </InputGroup> */}
 
                     <Button type="submit" color="success" block>Create Account</Button>
                   </Form>
                 </CardBody>
-                <CardFooter className="p-4">
-                  <Row>
-                    <Col xs="12" sm="6">
-                      <Button className="btn-facebook mb-1" block><span>facebook</span></Button>
-                    </Col>
-                    <Col xs="12" sm="6">
-                      <Button className="btn-twitter mb-1" block><span>twitter</span></Button>
-                    </Col>
-                  </Row>
-                </CardFooter>
+               
               </Card>
             </Col>
           </Row>

@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import logo from '../../assets/img/brand/logo_head_left.png'
 import sygnet from '../../assets/img/brand/sygnet.svg'
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
 
 const propTypes = {
   children: PropTypes.node,
@@ -57,20 +58,49 @@ class DefaultHeader extends Component {
   }
   handleLogout (event) {
     // event.preventDefault();
-    localStorage.clear();
     
     console.log('Handle Logout', event);
+    console.log('User Name : ', localStorage.userName);
 
-    setTimeout(
-      function() {
-        window.location = '/login';
-        // return <Redirect to={{pathname: '/login'}} push={true}/>
-        // this.props.history.push("/login");
-        // hashHistory.push('/login')
+    fetch(base+`/api/user-logout/?id=${localStorage.userName}` , {
+      method: "get"
+    })
+    .then((result) => result.json())
+    .then((info) => { 
+      if (info.success == true) {
+        console.log('Success : ', info.success);
+
+        localStorage.clear();
+
+        setTimeout(
+          function() {
+            window.location = '/login';
+            // return <Redirect to={{pathname: '/login'}} push={true}/>
+            // this.props.history.push("/login");
+            // hashHistory.push('/login')
+          }
+          .bind(this),
+          1000
+        );
       }
-      .bind(this),
-      1000
-    );
+      else {
+        console.log(info.success);
+
+        localStorage.clear();
+
+        setTimeout(
+          function() {
+            window.location = '/login';
+            // return <Redirect to={{pathname: '/login'}} push={true}/>
+            // this.props.history.push("/login");
+            // hashHistory.push('/login')
+          }
+          .bind(this),
+          1000
+        );
+      }
+      
+    })
 
   }
 

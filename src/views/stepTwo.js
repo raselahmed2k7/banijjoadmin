@@ -3,6 +3,7 @@ import {ToastsContainer, ToastsStore} from 'react-toasts';
 import  { Redirect } from 'react-router-dom';
 
 import {  Label,FormGroup, Button, Card, CardBody, CardFooter, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
 
 const Login = React.lazy(() => import('../Login'));
 
@@ -52,7 +53,7 @@ class stepTwo extends Component {
     console.log('submitted JSON value : ', JSON.stringify(this.state));
     console.log('submitted value : ', this.state);
 
-    fetch('/api/vendor-registration' , {
+    fetch(base+'/api/vendor-registration' , {
       method: "POST",
       headers: {
         'Content-type': 'application/json'

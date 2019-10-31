@@ -31,6 +31,7 @@ const SimpleLineIcons = React.lazy(() => import('./views/Icons/SimpleLineIcons')
 const Alerts = React.lazy(() => import('./views/Notifications/Alerts'));
 const Badges = React.lazy(() => import('./views/Notifications/Badges'));
 const Modals = React.lazy(() => import('./views/Notifications/Modals'));
+const CategoryOrder = React.lazy(() => import('./views/category_order/CategoryOrder'));
 
 const Colors = React.lazy(() => import('./views/Theme/Colors'));
 const Products = React.lazy(() => import('./views/product/Products'));
@@ -47,18 +48,30 @@ const ProductDiscounts = React.lazy(() => import('./views/product/ProductDiscoun
 // CUTOMER INFORMAION IMPORT
 const CustomerList = React.lazy(() => import('./views/customer/CustomerList'));
 const OrderList = React.lazy(() => import('./views/customer/OrderList'));
+const Purchase = React.lazy(() => import('./views/Purchase/Purchase'));
+const PurchaseReturn = React.lazy(() => import('./views/PurchaseReturn/PurchaseReturn'));
 
+// SALES INFORMATION IMPORT
+const SalesReturn = React.lazy(() => import('./views/SalesReturn/SalesReturn'));
+
+// FEATURE INFORMATION IMPORT
+const FeatureName = React.lazy(() => import('./views/FeatureName/FeatureName'));
+const Feature = React.lazy(() => import('./views/Feature/Feature'));
 const Typography = React.lazy(() => import('./views/Theme/Typography'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
+const FeturedCategory = React.lazy(() => import('./views/feturedCategory'));
+const TermsAndCondition = React.lazy(() => import('./views/TermsAndCondition/TermsAndCondition'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/terms-condition/add-terms-condition', name: 'Terms & Condition', component: TermsAndCondition },
+
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
-
+  { path: '/category/fetured-categories', name: 'Featured Category', component: FeturedCategory },
 
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/product/products', name: 'Products', component: Products },
@@ -67,6 +80,7 @@ const routes = [
   { path: '/product/vendor', name: 'Vendor', component: Vendor },
   { path: '/product/products-specifications', name: 'ProductSpecifications', component: ProductSpecifications },
   { path: '/product/products-specification-details', name: 'ProductSpecificationDetails', component: ProductSpecificationDetails },
+  { path: '/product/navbar-categories', name: 'Navbar Category Order', component: CategoryOrder },
 
   // DISCOUNTS ROUTE PATH
   { path: '/product/discount-list', name: 'Discounts', component: Discounts },
@@ -75,6 +89,17 @@ const routes = [
   // CUSTOMER ROUTE PATH
   { path: '/customer/customer-List', name: 'CustomerList', component: CustomerList },
   { path: '/customer/order-List', name: 'OrderList', component: OrderList },
+
+  // PURCHASE ROUTE PATH
+  { path: '/purchase/purchase', name: 'Purchase', component: Purchase },
+  { path: '/purchase/purchase-return', name: 'Purchase', component: PurchaseReturn },
+
+  // SALES ROUTE PATH 
+  { path: '/sales/sales-return', name: 'Sales', component: SalesReturn },
+
+  // FEATURE ROUTE PATH 
+  { path: '/feature/feature', name: 'Feature Products', component: Feature },
+  { path: '/feature/feature_name', name: 'Feature Name', component: FeatureName },
 
   { path: '/theme/typography', name: 'Typography', component: Typography },
   { path: '/base', exact: true, name: 'Base', component: Cards },

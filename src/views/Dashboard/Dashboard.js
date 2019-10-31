@@ -22,6 +22,7 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
 
 const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 

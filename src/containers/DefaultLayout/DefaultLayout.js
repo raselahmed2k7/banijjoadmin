@@ -24,6 +24,7 @@ const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 const isAuth = localStorage.user_status=="approved"?true:false;
+const userType = localStorage.user_type;
 
 class DefaultLayout extends Component {
   constructor(props) {
@@ -67,17 +68,45 @@ class DefaultLayout extends Component {
                   {
                     routes.map((route, idx) => {
                       if(isAuth){
-                        return route.component ? (
-                      
-                          <Route
-                            key={idx}
-                            path={route.path}
-                            exact={route.exact}
-                            name={route.name}
-                            render={props => (
-                              <route.component {...props} />
-                            )} />
-                        ) : (null);
+                        if (userType == 'super_admin' || userType == 'admin' || userType == 'admin_manager') {
+                          return route.component ? (
+                        
+                            <Route
+                                key={idx}
+                                path={route.path}
+                                exact={route.exact}
+                                name={route.name}
+                                render={props => (
+                                <route.component {...props} />
+                                )} />
+                          ) : (null);
+                        }
+                        else if (userType == 'vendor' && (route.name == 'Products' || route.name == 'Dashboard' || route.name == 'Purchase' || route.name == 'ProductSpecificationDetails')) {
+                          return route.component ? (
+                        
+                            <Route
+                                key={idx}
+                                path={route.path}
+                                exact={route.exact}
+                                name={route.name}
+                                render={props => (
+                                <route.component {...props} />
+                                )} />
+                          ) : (null);
+                        }
+                        else if (userType == 'delivery_man' && (route.name == 'Dashboard')) {
+                          return route.component ? (
+                        
+                            <Route
+                                key={idx}
+                                path={route.path}
+                                exact={route.exact}
+                                name={route.name}
+                                render={props => (
+                                <route.component {...props} />
+                                )} />
+                          ) : (null);
+                        }
                       }
                   })
                   }

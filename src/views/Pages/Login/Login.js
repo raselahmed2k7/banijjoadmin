@@ -5,7 +5,7 @@ import logo from '../../../assets/img/brand/logo_head_left.png'
 import sygnet from '../../../assets/img/brand/sygnet.svg'
 import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import {ToastsContainer, ToastsStore} from 'react-toasts';
-
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
 class Login extends Component {
   
   constructor(props) {
@@ -44,8 +44,10 @@ class Login extends Component {
     
     console.log('submitted JSON value : ', JSON.stringify(this.state));
     console.log('submitted value : ', this.state);
+    console.log('submitted value user name : ', this.state.username);
+    console.log('submitted value : ', this.state.password);
 
-    fetch('/api/user-login' , {
+    fetch(base+'/api/user-login' , {
       method: "POST",
       headers: {
         'Content-type': 'application/json'
@@ -59,11 +61,15 @@ class Login extends Component {
         ToastsStore.success("User  Successfully Logedin !!");
         console.log('Success : ', info.success);
 
+        console.log('The response is : ', info);
+
         localStorage.setItem('userName', info.session.username);
         localStorage.setItem('email', info.session.email);
         localStorage.setItem('user_status', info.session.user_status);
         localStorage.setItem('employee_id', info.session.employee_id);
         localStorage.setItem('user_type', info.session.user_type);
+
+        console.log(localStorage.user_status);
 
         const isApproved = localStorage.user_status=='approved'?true:false;
         isApproved===true ? this.props.history.push("/dashboard"):this.props.history.push("/rogister");

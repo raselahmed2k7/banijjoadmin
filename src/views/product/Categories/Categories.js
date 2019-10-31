@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {ToastsContainer, ToastsStore} from 'react-toasts';
 import {
   Badge,
   Button,
@@ -25,6 +26,8 @@ import {
   Label,
   Row,
 } from 'reactstrap';
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
+
 class Categories extends Component {
   constructor(props) {
     super(props);
@@ -33,6 +36,7 @@ class Categories extends Component {
     this.toggleFade = this.toggleFade.bind(this);
     this.state = {
       productsCategory: [],
+      productsSpecialCategory: [],
       collapse: true,
       fadeIn: true,
       timeout: 300
@@ -54,7 +58,7 @@ class Categories extends Component {
       this.props.history.push("/login");
     }
 
-    fetch('/api/categories', {
+    fetch(base+'/api/categories', {
       method: 'GET'
     })
     .then(res => {
@@ -68,10 +72,37 @@ class Categories extends Component {
       })
       return false;
     });
+
+    fetch(base+'/api/specialCategoryListForCategory', {
+      method: 'GET'
+    })
+    .then(res => {
+      console.log(res);
+      return res.json()
+    })
+    .then(category => {
+      console.log(category.data); 
+
+      let categoryList = [];
+
+      for ( let i = 0; i < category.data.length; i++) {
+        if (category.data[i] != null) {
+          categoryList[i] = category.data[i];
+        }
+      }
+
+      console.log('Category List : ', categoryList);
+
+      this.setState({ 
+        productsSpecialCategory : categoryList
+      });
+      console.log('Special Category : ', this.state.productsSpecialCategory); 
+      return false;
+    });
   }
 
   handleGet(event) {
-    fetch('/api/categories', {
+    fetch(base+'/api/categories', {
       method: 'GET'
     })
     .then(res => {
@@ -94,7 +125,7 @@ class Categories extends Component {
 
     const { categoryName, parentCategory, categoryDescription, isActive } = this.state;
 
-    fetch('/api/saveCategory' , {
+    fetch(base+'/api/saveCategory' , {
       method: "POST",
       headers: {
         'Content-type': 'application/json'
@@ -104,14 +135,24 @@ class Categories extends Component {
     .then((result) => result.json())
     .then((info) => { 
       console.log(info); 
-      setTimeout(
-        function() {
-        // this.props.history.push("/product/vendor");
-        window.location = '/product/categories';
-        }
-        .bind(this),
-        3000
-      );
+      if (info.success == true) {
+        ToastsStore.success("Category Successfully inserted !!");
+        console.log(info.success);
+        
+        setTimeout(
+          function() {
+          // this.props.history.push("/product/vendor");
+          window.location = '/product/categories';
+          }
+          .bind(this),
+          3000
+        );
+      }
+      else {
+        ToastsStore.warning("Category Insertion Faild. Please try again !!");
+        console.log(info.success);
+      }
+
     })
   }
 
@@ -145,6 +186,7 @@ class Categories extends Component {
           <CardHeader>
             <strong>Add New Category</strong> 
           </CardHeader>
+          <ToastsContainer store={ToastsStore}/>
           <CardBody>
             <Form action="" method="post" encType="multipart/form-data" onSubmit={this.handleSubmit} onChange={this.handleChange} className="form-horizontal">
 
@@ -165,9 +207,9 @@ class Categories extends Component {
                   <Input type="select" name="parentCategory" id="parentCategory" value={this.state.value} onChange={this.handleChange}>
                     <option value="0">Please select</option>
                     {
-                      this.state.productsCategory.map((productsCategoryValue, key) =>
+                      this.state.productsSpecialCategory.map((productsCategoryValue, key) =>
                         // productsCategory.parent_category_id == productsCategoryValue.id ? productsCategoryValue.category_name : null
-                        <option value={productsCategoryValue.id}> {productsCategoryValue.category_name} </option>
+                        <option value={key}> {productsCategoryValue} </option>
                       )
                     }
                   </Input>

@@ -30,6 +30,8 @@ import {
   Label,
   Row,
 } from 'reactstrap';
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
+
 class ProductSpecifications extends Component {
   constructor(props) {
     super(props);
@@ -72,7 +74,7 @@ class ProductSpecifications extends Component {
       this.props.history.push("/login");
     }
     
-    fetch('/api/categories', {
+    fetch(base+'/api/categories', {
       method: 'GET'
     })
     .then(res => {
@@ -88,7 +90,7 @@ class ProductSpecifications extends Component {
       return false;
     });
 
-    fetch('/api/product_specification_names', {
+    fetch(base+'/api/product_specification_names', {
       method: 'GET'
     })
     .then(res => {
@@ -159,7 +161,7 @@ class ProductSpecifications extends Component {
     console.log(this.state);
     event.preventDefault();
 
-    fetch('/api/saveSpecification' , {
+    fetch(base+'/api/saveSpecification' , {
       method: "POST",
       headers: {
         'Content-type': 'application/json'

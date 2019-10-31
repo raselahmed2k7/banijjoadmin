@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import {ToastsContainer, ToastsStore} from 'react-toasts';
 import ImageUploader from 'react-images-upload';
+import axios from 'axios';
+
 // import { Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
 import {
   Badge,
@@ -28,6 +30,9 @@ import {
   Label,
   Row,
 } from 'reactstrap';
+const base = process.env.REACT_APP_ADMIN_SERVER_URL; 
+const publicUrl = process.env.REACT_APP_PUBLIC_URL; 
+// const FormData = require('form-data');
 
 class Vendor extends Component {
   constructor(props) {
@@ -39,11 +44,16 @@ class Vendor extends Component {
       pictures: [],
       collapse: true,
       fadeIn: true,
-      timeout: 300
+      timeout: 300,
+      imageURL:'',
+      selectedFile: null,
+      vendorImagePreview:''
+      // allFilesInfo:[]
     };
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
     this.handleProductChange = this.handleProductChange.bind(this);
+    this.handleUploadImage = this.handleUploadImage.bind(this);
     this.onDrop = this.onDrop.bind(this);
   }
 
@@ -56,11 +66,11 @@ class Vendor extends Component {
   }
 
   componentDidMount() {
-    fetch('/api/vendor_list_for_product', {
+    fetch(base+'/api/vendor_list_for_product', {
       method: 'GET'
     })
     .then(res => {
-      console.log(res);
+      // console.log(res);
       return res.json()
     })
     .then(vendors => {
@@ -69,7 +79,7 @@ class Vendor extends Component {
         vendorList : vendors.data
       })
 
-      console.log('Vendor Data : ', this.state.vendorList);
+      // console.log('Vendor Data : ', this.state.vendorList);
       return false;
     });
   }
@@ -94,49 +104,138 @@ class Vendor extends Component {
 
   }
 
-  handleSubmit (event) {
-    event.preventDefault();
-    console.log('submitted value : ', this.state);
-    console.log('submitted Image : ', this.state.image);
-    console.log('submitted Image value : ', this.state.pictures[0].path);
+  // handleSubmit (event) {
+  //   event.preventDefault();
+  //   console.log('submitted value : ', this.state);
+  //   console.log('submitted Image : ', this.state.image);
+  //   console.log('submitted Image value : ', this.state.pictures[0].path);
 
-    // this.setState({
-    //   pictures: this.state.pictures.concat(this.state.image),
+  //   // this.setState({
+  //   //   pictures: this.state.pictures.concat(this.state.image),
+  //   // });
+
+  //   console.log('submitted Picture value : ', this.state.pictures);
+
+  //   fetch('/api/saveVendor' , {
+  //     method: "POST",
+  //     headers: {
+  //       'Content-type': 'application/json'
+  //     },
+  //     body: JSON.stringify(this.state)
+  //   })
+  //   .then((result) => result.json())
+  //   .then((info) => { 
+  //     if (info.success == true) {
+  //       ToastsStore.success("Vendor Successfully inserted !!");
+  //       console.log(info.success);
+  //       setTimeout(
+  //         function() {
+  //         // this.props.history.push("/product/vendor");
+  //         window.location = '/product/vendor';
+  //         }
+  //         .bind(this),
+  //         3000
+  //       );
+  //     }
+  //     else {
+  //       ToastsStore.warning("Product Insertion Faild. Please try again !!");
+  //       console.log(info.success);
+  //     }
+      
+  //   })
+  // }
+
+  handleUploadImage(ev) {
+    ev.preventDefault();
+    const data = new FormData(ev.target);
+    // for (const file of this.state.allFilesInfo) {
+    //   data.append('file', file)
+    // }
+     data.append('file', this.state.selectedFile);
+    // data.append('file', this.state.allFilesInfo);
+    // console.log(data);
+    // fetch('/api/saveVendor', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data'
+    //   },
+    //   body: data
+    // }).then((response) => {
+    //   response.json()
+    //   .then((data) => {
+    //     console.log(data);
+    //     // this.setState({ imageURL: `http://localhost:8000/${body.file}` });
+    //   });
     // });
 
-    console.log('submitted Picture value : ', this.state.pictures);
-
-    fetch('/api/saveVendor' , {
-      method: "POST",
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(this.state)
-    })
-    .then((result) => result.json())
-    .then((info) => { 
-      if (info.success == true) {
-        ToastsStore.success("Vendor Successfully inserted !!");
-        console.log(info.success);
-        setTimeout(
-          function() {
-          // this.props.history.push("/product/vendor");
-          window.location = '/product/vendor';
-          }
-          .bind(this),
-          3000
-        );
-      }
-      else {
-        ToastsStore.warning("Product Insertion Faild. Please try again !!");
-        console.log(info.success);
-      }
-      
-    })
+    axios({
+      method: 'post',
+      url: base+'/api/saveVendor',
+      data: data,
+      //  headers: FormData.getHeaders()
+      })
+      .then(function (response) {
+          //handle success
+        // let  data =  response.json();
+        if(response.data.message=="success"){
+          ToastsStore.success("Vendor Successfully inserted !!");
+                setTimeout(
+                  function() {
+                  window.location = '/product/vendor';
+                  }
+                  .bind(this),
+                  3000
+                );
+        }
+      })
+      .catch(function (response) {
+          //handle error
+          console.log(response);
+      });
   }
 
-  render() {
+  
+  onChangeHandler=event=>{
+    // let testFileInfo = {}
+    //  testFileInfo.selectedFile = event.target.files[0];
+  //   const  fileInput = event.target.files[0];
 
+    
+  //    this.setState({selectedFile:event.target.files[0]})
+  //  //  this.state.allFilesInfo.push(event.target.files[0]);
+  //  var reader = new FileReader();
+  //  reader.onload = (e) => {
+  //    this.state.vendorImage = event.target.files[0];
+  //  }
+  //  reader.readAsDataURL(fileInput);
+   
+
+
+
+   let reader = new FileReader();
+    let file = event.target.files[0];
+    if (!file.name.match(/.(jpg|jpeg|png|gif)$/i)){
+      ToastsStore.warning("Image is not valid");
+      return false;
+    }
+    else{
+      reader.onloadend = () => {
+        this.setState({
+          selectedFile: file,
+          vendorImagePreview: reader.result
+        },()=>{console.log(this.state)});
+    }
+      reader.readAsDataURL(file)
+    }    
+  }
+ 
+
+  render() {
+    let {vendorImagePreview} = this.state;
+    let $imagePreview = null;
+    if (vendorImagePreview) {
+      $imagePreview = (<img width="100" height="100" src={vendorImagePreview} />);
+    }
     return (
       <Row>
         <ToastsContainer store={ToastsStore}/>
@@ -146,7 +245,7 @@ class Vendor extends Component {
             <strong>Add Vendor</strong> 
           </CardHeader>
           <CardBody>
-            <Form action="" method="post" encType="multipart/form-data" className="form-horizontal" onSubmit={this.handleSubmit}  onChange={this.handleProductChange}>
+            <Form  refs action="" method="post" encType="multipart/form-data" className="form-horizontal" onSubmit={this.handleUploadImage}  onChange={this.handleProductChange}>
               <FormGroup row>
                 <Col md="3">
                   <Label htmlFor="name">Vendor Name</Label>
@@ -207,18 +306,14 @@ class Vendor extends Component {
                   <Label htmlFor="image">Vendor Image</Label>
                 </Col>
                 <Col xs="12" md="9">
-                      {/* <Input type="file" id="image" name="image" /> */}
-                      <ImageUploader
-                        id="iamge"
-                        name="image"
-                        withIcon={true}
-                        buttonText='Choose images'
-                        onChange={this.onDrop}
-                        imgExtension={['.jpg', '.gif', '.png', '.gif']}
-                        maxFileSize={5242880}
-                        withPreview = {true}
-                      />
-                    </Col>
+                    <label for="file-input">
+                      <img src={publicUrl+"/productFormatedImages/Asset3.png"}/>
+                    </label>
+
+                    <Input style={{visibility:"hidden"}} type="file" onChange={this.onChangeHandler} id="file-input" name="image" />
+                    <div style={{height:"10px"}}></div>
+                    {$imagePreview}
+                </Col>
               </FormGroup>
               <Button type="submit" size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Submit</Button>&nbsp;
               <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
@@ -240,6 +335,7 @@ class Vendor extends Component {
                   <thead>
                   <tr>
                     <th>Vendor Name</th>
+                    <th>Vendor Image</th>
                     <th>Email</th>
                     <th>Website</th>
                     <th>Address</th>
@@ -251,6 +347,14 @@ class Vendor extends Component {
                     this.state.vendorList.map((vendorListValue, key) =>
                     <tr>
                       <td>{vendorListValue.name}</td>
+                      <td>
+                      {
+                        vendorListValue.image?<img width="60" height="60" src={publicUrl+'/upload/vendor/personal/'+vendorListValue.image}></img>
+                        :
+                        <img width="60" height="60" src={publicUrl+'/upload/vendor/personal/default.png'}></img> 
+                      }
+                        
+                        </td>
                       <td>{vendorListValue.email}</td>
                       <td>{vendorListValue.website}</td>
                       <td>{vendorListValue.address}</td>
@@ -275,10 +379,7 @@ class Vendor extends Component {
               </CardBody>
             </Card>
           </Col>
-
-      
     </Row>
-    
     )
   }
 }
